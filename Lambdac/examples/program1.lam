@@ -1,0 +1,16 @@
+//
+// Exemplo da representacao dos numeros naturais
+//
+
+DECLARATIONS
+
+	zero  := \lambda f, x . x 
+	one   := \lambda f, x . f(x)
+	two   := \lambda f, x . f(f(x))
+	three := \lambda f, x . f(f(f(x)))
+
+	succ  := \lambda num, f, x . f(num(f,x))
+
+BODY
+
+	succ(three)

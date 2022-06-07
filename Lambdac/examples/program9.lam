@@ -1,0 +1,83 @@
+//
+// Exemplo de implementação do algoritmo "quick sort" 
+//
+
+DECLARATIONS
+
+	zero  := \lambda f, x . x 
+	succ  := \lambda num, f, x . f(num(f,x))
+	pred  := \lambda num, f, x . num (\lambda g, h. h(g(f))) (\lambda u . x) (\lambda u. u) 
+
+	one   := succ(zero)
+	two   := succ(one)
+	three := succ(two)
+	four  := succ(three)
+	
+	add    := \lambda n, m, f, x . n( f, m(f,x) )
+	sub    := \lambda n, m . m(pred,n)
+
+	true  := \lambda x, y . x
+	false := \lambda x, y . y
+	not   := \lambda b, x, y . b(y,x)
+
+	is-zero := \lambda num . num(\lambda z . false, true)
+	less    := \lambda n, m . not(is-zero(sub(m,n)))
+	less-eq := \lambda n, m . is-zero(sub(n,m))
+	greater := \lambda n, m . not(less-eq(n,m))
+
+	if-then-else := \lambda b, e1, e2. b(e1,e2)
+
+	y-combinator := \lambda g . (\lambda x . g(x(x))) (\lambda y . g(y(y)))
+	
+	pair   := \lambda x, y, f . f(x, y) 
+	first  := \lambda p . p(true) 
+	second := \lambda p . p(false) 
+	
+	nil    := \lambda x . true 
+	is-nil := \lambda p . p (\lambda x, y . false) 
+
+	concatenate := y-combinator
+                   (  \lambda concat, list1, list2 .
+                      if-then-else ( is-nil(list1) )
+                      (  list2  )
+                      (  pair( first(list1), 
+                               concat(second(list1), list2) 
+                              )
+                      )
+                   )
+                                 
+    filter    := y-combinator
+                 (  \lambda flter, predicate, list .
+                    if-then-else ( is-nil(list) )
+                    (  nil  )
+                    (  if-then-else ( predicate(first(list)) )
+                       (  pair( first(list), flter(predicate, second(list)) )  )
+                       (  flter(predicate, second(list))  )
+                    )
+                 )
+
+	quick-sort := y-combinator
+	           (  \lambda quicksort, list .
+	              if-then-else ( is-nil(list) )
+	              (  nil  )
+	              (  concatenate( quicksort( filter( less-eq(first(list)),
+	                                                 second(list) )
+	                                       ),
+	                              pair( first(list) ,
+	                                    quicksort( filter( greater(first(list)),
+	                                                       second(list) ) 
+	                                             )
+	                                  )
+	                            )
+	              )
+	           )
+
+	qsort :=  \lambda list . quick-sort(list)
+
+	//my-list := pair(two, pair(four, pair(three, pair(one, pair(four, nil)))))
+	my-list := pair(two, pair(four, nil))
+
+	
+BODY
+
+	qsort(my-list)

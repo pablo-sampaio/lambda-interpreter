@@ -1,0 +1,120 @@
+package lambdac.frontend;
+
+import java.util.List;
+import java.util.LinkedList;
+
+import java_cup.runtime.*;
+import lambdac.tree.*;
+
+
+parser code {:
+   
+   public Program start() throws Exception {
+      Symbol symbol = parse();
+      return (Program)symbol.value;
+   }
+   
+   public void unrecovered_syntax_error(Symbol cur_token) throws Exception {
+       report_fatal_error("Erro no token \"" + cur_token.value + "\"" 
+       						+ " na linha " + ((Token)cur_token).getLine()
+       						+ " na coluna " + ((Token)cur_token).getColumn() + ".", null);
+   }
+   
+:}
+
+/*****  Terminais (tokens) *****/
+
+terminal         LAMBDA, POINT, COMMA, LEFT_PAR, RIGHT_PAR, IS;
+terminal         DECLARE_KW, BODY_KW;
+terminal String  IDENTIFIER, ATOM;
+
+
+/***** Nao-terminais *****/
+
+non terminal Program            program;
+non terminal DeclarationSection declSection, listDeclarations;
+non terminal Declaration        declaration;
+non terminal Expression         expression;
+non terminal Expression         bodySection;
+non terminal LinkedList<String>     varList, separatedVarList;
+non terminal LinkedList<Expression> exprList, separatedExprList;
+
+
+/***** A gramática *****/
+
+program ::= declSection:decl bodySection:bd 
+            {: RESULT = new Program(decl,bd); :}
+          ;
+
+declSection ::= DECLARE_KW listDeclarations:list
+                {: RESULT = list; :}
+              | /*empty*/
+                {: RESULT = new DeclarationSection(); :}
+              ;
+
+listDeclarations ::= listDeclarations:list declaration:d
+                     {: list.addDeclaration(d); RESULT = list; :}
+                   | /*empty*/
+                     {: RESULT = new DeclarationSection(); :}
+                   ;
+
+declaration ::= IDENTIFIER:id IS expression:e 
+                 {: RESULT = new Declaration(id,e); :}
+              ;             
+
+expression ::= LAMBDA varList:list POINT expression:e
+               {: 
+                  RESULT = e;
+                  for (String name : list)
+                     RESULT = new FunctionAbstraction(name, RESULT);
+               :}
+			 
+			 | LEFT_PAR expression:e RIGHT_PAR
+			   {: RESULT = e; :}
+			 
+			 | expression:f LEFT_PAR exprList:list RIGHT_PAR
+               {: 
+                  RESULT = f;
+                  for (Expression exp : list) 
+                     RESULT = new FunctionApplication(RESULT, exp);
+               :}
+			 
+			 | IDENTIFIER:n
+			   {: RESULT = new FreeVariable(n); :}
+			 
+			 | ATOM:n
+			   {: RESULT = new AtomVariable(n); :}
+			 
+			 ;
+
+varList ::= IDENTIFIER:id separatedVarList:list
+            {: 
+               // cria a lista invertida
+               list.addLast(id); 
+               RESULT = list; 
+            :}
+          ;
+
+separatedVarList ::= separatedVarList:list COMMA IDENTIFIER:id
+                     {: 
+                        // cria a lista invertida
+                        list.addFirst(id);
+                        RESULT = list; 
+                     :}
+				   | /*empty*/
+                     {: RESULT = new LinkedList<String>(); :}
+				   ;
+
+exprList ::= expression:e separatedExprList:list
+             {: list.addFirst(e); RESULT = list; :}
+		   ;
+
+separatedExprList ::= separatedExprList:list COMMA expression:e
+                      {: list.addLast(e); RESULT = list; :}
+				   | /*empty*/
+                     {: RESULT = new LinkedList<Expression>(); :}
+				   ;
+
+bodySection ::= BODY_KW expression:e
+                {: RESULT = e; :}
+              ;

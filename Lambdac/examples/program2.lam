@@ -1,0 +1,21 @@
+//
+// Exemplos de operacoes aritmeticas
+//
+
+DECLARATIONS
+
+	zero  := \lambda f, x . x 
+	succ  := \lambda num, f, x . f(num(f,x))
+	pred  := \lambda num, f, x . num (\lambda g, h. h(g(f))) (\lambda u . x) (\lambda u. u) 
+	
+	one   := succ(zero)
+	two   := succ(one)
+	three := succ(two)
+	
+	add  := \lambda n, m, f, x . n( f, m(f,x) )  //alternativa: \lambda n, m . n(succ,m)
+	sub  := \lambda n, m . m(pred,n)
+	mult := \lambda n, m, f . n(m(f))            //alternativa: \lambda n, m . n(add(m),zero)
+
+BODY
+
+	add(three, one)

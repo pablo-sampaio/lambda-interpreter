@@ -1,0 +1,96 @@
+//
+// Merge-sort implementation
+// (only run with small examples)
+//
+
+DECLARATIONS
+
+	zero  := \lambda f, x . x 
+	succ  := \lambda num, f, x . f(num(f,x))
+	pred  := \lambda num, f, x . num (\lambda g, h. h(g(f))) (\lambda u . x) (\lambda u. u) 
+
+	one   := succ(zero)
+	two   := succ(one)
+	three := succ(two)
+	four  := succ(three)
+	
+	add    := \lambda n, m, f, x . n( f, m(f,x) )
+	sub    := \lambda n, m . m(pred,n)
+
+	true  := \lambda x, y . x
+	false := \lambda x, y . y
+	not   := \lambda b, x, y . b(y,x)
+
+	is-zero := \lambda num . num(\lambda z . false, true)
+	less    := \lambda n, m . not(is-zero(sub(m,n)))
+	less-eq := \lambda n, m . is-zero(sub(n,m))
+
+	if-then-else := \lambda b, e1, e2. b(e1,e2)
+
+	y-combinator := \lambda g . (\lambda x . g(x(x))) (\lambda y . g(y(y)))
+
+	div    := y-combinator 
+	          (  \lambda dv, n, m .
+	             if-then-else ( less-eq(m,n) )
+	             (  succ(dv(sub(n,m),m))  )
+	             (  zero  )
+              )
+	half   := \lambda n . div(n,two) 
+	
+	pair   := \lambda x, y, f . f(x, y) 
+	first  := \lambda p . p(true) 
+	second := \lambda p . p(false) 
+	
+	nil    := \lambda x . true 
+	is-nil := \lambda p . p (\lambda x, y . false) 
+	
+	split     := y-combinator
+	             (  \lambda splt, list, inicio, fim .
+	                if-then-else ( is-zero(pred(inicio)) )
+	                (  if-then-else ( is-zero(pred(fim)) )
+	                   (  pair( first(list), nil) )  
+	                   (  pair( first(list), splt(second(list),one,pred(fim)) )  )
+	                )
+	                (  splt(second(list), pred(inicio), pred(fim))  )
+                 )
+
+	length    := y-combinator
+	             (  \lambda len, list .
+	                if-then-else ( is-nil(list) )
+	                (  zero  )
+	                (  succ(len(second(list))) )
+                 )
+
+	merge      := y-combinator
+	              (  \lambda mrg, list1, list2 .
+	                 if-then-else ( is-nil(list1) )
+	                 (  list2  )
+	                 (  if-then-else ( is-nil(list2)  )
+	                    (  list1  )
+	                    (  if-then-else ( less(first(list1), first(list2))  )
+	                       (  pair( first(list1) , mrg(second(list1), list2) )  )
+	                       (  pair( first(list2) , mrg(list1, second(list2)) )  )
+	                    )
+	                 )
+                  )
+
+	merge-sort := y-combinator
+	              (  \lambda mergesort, list, n .
+	                 if-then-else ( less-eq(n,one) )
+	                 (  list  )
+	                 (  merge( mergesort( split(list,one,half(n)), half(n) ), 
+	                           mergesort( split(list,succ(half(n)), n ), sub(n,half(n))) 
+	                         )  
+	                 )
+	              )
+
+	msort :=  \lambda list . merge-sort(list, length(list))
+
+	//my-list := pair(two, pair(four, pair(three, pair(one, pair(four, nil)))))
+	my-list := pair(two, pair(four, pair(three, pair(one, nil))))
+
+
+BODY
+
+	msort(my-list)
+

@@ -1,0 +1,35 @@
+
+ideias:
+
+ - nos exemplos
+   * rever comentários iniciais
+   * organizar didaticamente
+
+ - melhorias sintáticas (ex: declaração, avaliação)
+ 
+ - rever mensagens sucesso/erro do interpretador
+
+ - otimizações
+   * tentar novamente guardar evaluatedVersion --> pouco ganho
+   * fazer a avaliação avançar 1 por vez por questões de memória
+   * atributos deixarem de ser final (tem que fazer replicate? replace retornar novo, se substituir) 
+ 
+ - baixar outro interpretador e comparar
+ 
+ - pensar justificativa para não renomear parametros da expr no replace
+
+
+performance (melhoria do replace):
+
+ - replace antigo
+   fib(5)  - 1266 ms
+   fact(5) - 23609 ms
+   qsort   - 17765 ms
+   qsort(nil) - 172 ms
+
+ - replace preservando referencias
+   fib(5)  - 1218 ms
+   fact(5) - 22687 ms
+   qsort   -  3078 ms
+
+ 

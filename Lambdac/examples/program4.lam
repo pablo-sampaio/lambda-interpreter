@@ -1,0 +1,53 @@
+//
+// Exemplos de funções recursivas
+//
+
+DECLARATIONS
+
+	zero  := \lambda f, x . x 
+	succ  := \lambda num, f, x . f(num(f,x))
+	pred  := \lambda num, f, x . num (\lambda g, h. h(g(f))) (\lambda u . x) (\lambda u. u) 
+	
+	one   := succ(zero)
+	two   := succ(one)
+	three := succ(two)
+	
+	add  := \lambda n, m, f, x . n( f, m(f,x) )
+	sub  := \lambda n, m . m(pred,n)
+	mult := \lambda n, m, f . n(m(f))
+
+	true  := \lambda x, y . x
+	false := \lambda x, y . y
+	if-then-else := \lambda a, b, c. a(b,c)
+	
+	is-zero := \lambda num . num((\lambda z . false), true)
+	less-eq := \lambda n, m . is-zero(sub(n,m))
+
+	y-combinator := \lambda g . (\lambda x . g(x(x))) (\lambda y . g(y(y)))
+
+	div    := y-combinator 
+	          (  \lambda dv, n, m .
+	             if-then-else ( less-eq(m,n) )
+	             (  succ(dv(sub(n,m),m))  )
+	             (  zero  )
+              )
+
+	factorial := y-combinator
+			     (  \lambda fact, n . 
+				    if-then-else (  is-zero(n)  ) 
+                    (  one  )
+                    (  mult(n,fact(pred(n)))  )
+			     )
+
+	fibonacci := y-combinator
+			     (  \lambda fib, n . 
+				    if-then-else (  less-eq(n,one)  )  
+					(  n  ) 
+					(  add( fib(pred(n)), fib(pred(pred(n))) )  )
+			     )
+
+BODY
+
+	//fibonaci(three)
+	//fibonaci(succ(succ(three)))
+	factorial(succ(succ(three)))

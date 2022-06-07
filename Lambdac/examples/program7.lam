@@ -1,0 +1,66 @@
+//
+// Exemplo de implementação do algoritmo "insertion sort" 
+//
+
+DECLARATIONS
+
+	zero  := \lambda f, x . x 
+	succ  := \lambda num, f, x . f(num(f,x))
+	pred  := \lambda num, f, x . num (\lambda g, h. h(g(f))) (\lambda u . x) (\lambda u. u) 
+
+	one   := succ(zero)
+	two   := succ(one)
+	three := succ(two)
+	four  := succ(three)
+	
+	add    := \lambda n, m, f, x . n( f, m(f,x) )
+	sub    := \lambda n, m . m(pred,n)
+
+	true  := \lambda x, y . x
+	false := \lambda x, y . y
+	not   := \lambda b, x, y . b(y,x)
+
+	is-zero := \lambda num . num(\lambda z . false, true)
+	less    := \lambda n, m . not(is-zero(sub(m,n)))
+	less-eq := \lambda n, m . is-zero(sub(n,m))
+
+	if-then-else := \lambda b, e1, e2. b(e1,e2)
+
+	y-combinator := \lambda g . (\lambda x . g(x(x))) (\lambda y . g(y(y)))
+	
+	pair   := \lambda x, y, f . f(x, y) 
+	first  := \lambda p . p(true) 
+	second := \lambda p . p(false) 
+	
+	nil    := \lambda x . true 
+	is-nil := \lambda p . p (\lambda x, y . false) 
+	
+	insert-ordered := y-combinator
+	                (  \lambda insertordered, element, list .
+	                   if-then-else ( is-nil(list) )
+	                   (  pair(element, nil)  )
+	                   (  if-then-else (  less(first(list), element)  )
+	                      (  pair(first(list), insertordered(element, second(list)))  )
+	                      (  pair(element, list)  )
+	                   )
+                    )
+
+	insertion-sort := y-combinator
+	                (  \lambda insertionsort, list, sortedlist .
+	                   if-then-else ( is-nil(list) )
+	                   (  sortedlist  )
+	                   (  insertionsort( second(list), 
+	                                     insert-ordered( first(list), sortedlist ) 
+	                                   )
+	                   )
+	                )
+
+	isort :=  \lambda list . insertion-sort(list, nil)
+
+	my-list := pair(two, pair(four, pair(three, pair(one, pair(four, nil)))))
+
+	
+BODY
+
+	isort(my-list)
+

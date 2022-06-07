@@ -1,0 +1,77 @@
+// 
+// Exemplos de pares e listas
+// 
+
+DECLARATIONS
+
+    zero  := \lambda f, x . x 
+    succ  := \lambda num, f, x . f(num(f,x))
+    pred  := \lambda num, f, x . num (\lambda g, h. h(g(f))) (\lambda u . x) (\lambda u. u) 
+
+    one   := succ(zero)
+    two   := succ(one)
+    three := succ(two)
+    four  := succ(three)
+
+    add  := \lambda n, m, f, x . n( f, m(f,x) )
+    sub  := \lambda n, m . m(pred,n)
+    
+    true  := \lambda x, y . x
+    false := \lambda x, y . y
+
+    is-zero := \lambda num . num(\lambda z . false, true)
+    less-eq := \lambda n, m . is-zero(sub(n,m))
+
+    if-then-else := \lambda b, e1, e2. b(e1,e2)
+
+    pair   := \lambda x, y, f . f(x, y) 
+    first  := \lambda p . p(true) 
+    second := \lambda p . p(false) 
+    
+    nil    := \lambda x . true 
+    is-nil := \lambda p . p (\lambda x, y . false) 
+
+    y-combinator := \lambda g . (\lambda x . g(x(x))) (\lambda y . g(y(y)))
+    
+    length    := y-combinator
+                 (  \lambda len, list .
+                    if-then-else ( is-nil(list) )
+                    (  zero  )
+                    (  succ(len(second(list))) )
+                 )
+
+    get-index := y-combinator
+                 (  \lambda geti, list, index .
+                    if-then-else ( is-zero(pred(index)) )
+                    (  first(list)  )
+                    (  geti(second(list), pred(index))  )
+                 )
+
+	// colocar como exercício
+	concatenate := y-combinator
+                   (  \lambda concat, list1, list2 .
+                       if-then-else ( is-nil(list1) )
+                      (  list2  )
+                      (  pair( first(list1), 
+                               concat(second(list1), list2) )
+                      )
+                   )
+
+    add-all  :=  y-combinator 
+                 (  \lambda addall, list .
+                    if-then-else ( is-nil(list) )
+                    (  zero  )
+                    (  add(first(list), addall(second(list)))  )
+                 )
+
+    num-pair  := pair(two, four)
+    atom-pair := pair(GOIABA, CAJA)
+    
+    num-list  := pair(two, pair(four, pair(three, pair(one, nil))))
+    atom-list := pair(GOIABA, pair(CAJA, pair(CAJU, pair(ARACA, nil))))
+
+BODY
+	
+	second(atom-pair)
+    //add-all(num-list)
+    //concatenate(num-list, atom-list)

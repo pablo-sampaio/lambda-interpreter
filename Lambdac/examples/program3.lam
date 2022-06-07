@@ -1,0 +1,34 @@
+//
+// Exemplos de valores e funções booleanos e átomos 
+//
+
+DECLARATIONS
+
+	zero  := \lambda f, x . x 
+	succ  := \lambda num, f, x . f(num(f,x))
+	pred  := \lambda num, f, x . num (\lambda g, h. h(g(f))) (\lambda u . x) (\lambda u. u) 
+	
+	one   := succ(zero)
+	two   := succ(one)
+	three := succ(two)
+	
+	sub  := \lambda n, m . m(pred,n)
+	
+	true  := \lambda x, y . x
+	false := \lambda x, y . y
+
+	if-then-else := \lambda a, b, c. a(b,c)
+
+	not   := \lambda b, x, y . b(y,x)
+	and   := \lambda b1, b2 . b1(b2,false)
+	or    := \lambda b1, b2 . b1(true,b2)   
+
+	is-even := \lambda num . num(not,true)
+	is-zero := \lambda num . num((\lambda z . false), true)
+	less-eq := \lambda n, m . is-zero(sub(n,m))
+
+BODY
+
+	if-then-else ( is-even(three) )
+	(  YES  )
+	(  NO  )
