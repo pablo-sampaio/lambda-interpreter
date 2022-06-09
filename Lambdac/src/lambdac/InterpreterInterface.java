@@ -8,14 +8,11 @@ import java.awt.Font;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileWriter;
-
-import javax.swing.filechooser.FileFilter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.net.URL;
 
@@ -30,6 +27,7 @@ import javax.swing.JScrollPane;
 import javax.swing.JSplitPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
+import javax.swing.filechooser.FileFilter;
 
 
 /**
@@ -49,8 +47,8 @@ public class InterpreterInterface extends JFrame {
 	protected JPanel panel1 = new JPanel();
 	protected JPanel panel2 = new JPanel();
 
-	protected JLabel lblSourceCode = new JLabel("Código fonte: ");
-	protected JLabel lblOuput       = new JLabel("Resultado:    ");
+	protected JLabel lblSourceCode = new JLabel("Source code: ");
+	protected JLabel lblOuput       = new JLabel("Result:    ");
 	
 	protected JTextArea txaInput = new JTextArea();
 	protected JTextArea txaOutput = new JTextArea();
@@ -71,7 +69,7 @@ public class InterpreterInterface extends JFrame {
 
 	private void initFrame() {
 		setTitle("Lambdac Interpreter (by Pablo 2014-2022)");
-		setMinimumSize(new Dimension(640, 480));
+		setMinimumSize(new Dimension(640, 580));
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
 		
 		setLayout(new BorderLayout());
@@ -112,7 +110,7 @@ public class InterpreterInterface extends JFrame {
 		panel2.add(lblOuput);
 		panel2.add(scrollPane2);
 		
-		fileChooser.setFileFilter(new XprFileFilter());
+		fileChooser.setFileFilter(new LamFileFilter());
 		
 		populateToolBar();
 	}
@@ -127,7 +125,7 @@ public class InterpreterInterface extends JFrame {
 				controller.buttonNewPressed(e);
 			}
 		}; 
-		button = createButton("Novo", "Cria novo código fonte", buttonListener);
+		button = createButton("New", "Create a new source code", buttonListener);
 		toolBar.add(button);
 		
 		// cria botão "Abrir"
@@ -136,7 +134,7 @@ public class InterpreterInterface extends JFrame {
 				controller.buttonOpenPressed(e);
 			}
 		}; 
-		button = createButton("Abrir", "Abre um arquivo", buttonListener);
+		button = createButton("Open", "Open a file", buttonListener);
 		toolBar.add(button);
 		
 		// cria botão "Salvar"
@@ -145,7 +143,7 @@ public class InterpreterInterface extends JFrame {
 				controller.buttonSavePressed(e);
 			}
 		}; 
-		button = createButton("Salvar", "Salva para arquivo", buttonListener);
+		button = createButton("Save", "Save file", buttonListener);
 		toolBar.add(button);
 		
 		toolBar.addSeparator();
@@ -156,7 +154,7 @@ public class InterpreterInterface extends JFrame {
 				controller.buttonCompilePressed(e);
 			}
 		}; 
-		button = createButton("Interpretar", "Interpreta o código fonte", buttonListener);
+		button = createButton("Interpret", "Interpret the open source code", buttonListener);
 		toolBar.add(button);
 		
 		// cria botão "Limpar"
@@ -165,7 +163,7 @@ public class InterpreterInterface extends JFrame {
 				controller.buttonCleanPressed(e);
 			}
 		}; 
-		button = createButton("Limpar", "Limpa a saída", buttonListener);
+		button = createButton("Clear", "Clear the current output", buttonListener);
 		toolBar.add(button);
 
 		toolBar.addSeparator();
@@ -176,7 +174,7 @@ public class InterpreterInterface extends JFrame {
 				System.exit(0);
 			}
 		}; 
-		button = createButton("Sair", "Fecha a aplicação", buttonListener);
+		button = createButton("Exit", "Close this application", buttonListener);
 		toolBar.add(button);
 
 	}
@@ -185,10 +183,10 @@ public class InterpreterInterface extends JFrame {
 			                     String toolTipText,
 			                     ActionListener listener) {
 
-		String imgLocation = "..\\..\\images\\"
+		String imgLocation = "images/"
 							+ name 
-							+ ".png";
-		URL imageURL = InterpreterInterface.class.getResource(imgLocation);
+							+ ".PNG";
+		URL imageURL = getClass().getClassLoader().getResource(imgLocation);
 		
 		//Create and initialize the button.
 		JButton button = new JButton();
@@ -267,6 +265,8 @@ class InterfaceController {
 
 				frame.txaInput.setText(fileContent.toString());
 				frame.clearOutput();
+				
+				fileReader.close();
 			
 			} catch (IOException exc) {
 				frame.clearOutput(false);
@@ -308,7 +308,7 @@ class InterfaceController {
 			mensagensErro = frame.interpreter.interpret(new ByteArrayInputStream(codigo.getBytes()),
 					new TextAreaOutputStream(frame.txaOutput));
 		
-		} catch (Exception exc) { //TODO: rever
+		} catch (Exception exc) {
 			mensagensErro = new ErrorReport();
 			mensagensErro.addMessage(exc.getMessage() + " - " + exc.getLocalizedMessage());
 
@@ -330,7 +330,7 @@ class InterfaceController {
 
 }
 
-class XprFileFilter extends FileFilter {
+class LamFileFilter extends FileFilter {
 
 	@Override
 	public boolean accept(File path) {

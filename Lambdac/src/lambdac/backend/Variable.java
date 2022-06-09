@@ -5,6 +5,11 @@ import java.io.PrintStream;
 import lambdac.ErrorReport;
 
 
+/**
+ * Abstract superclass for @FreeVariable and @BoundVariable.
+ * @author Pablo
+ *
+ */
 public abstract class Variable extends Expression {
 	protected final String name;
 	

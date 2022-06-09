@@ -15,7 +15,7 @@ public class TestInterpreter {
 		
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         
-        System.out.print("Digite o numero do programa: ");
+        System.out.print("Type the program number (inside \"examples\" folder): ");
         String arquivo = "examples\\program" + in.readLine() + ".lam";
 
 		ErrorReport report = interpreter.interpret(arquivo);

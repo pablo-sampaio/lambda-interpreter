@@ -48,6 +48,7 @@ DECLARATIONS
 
 BODY
 
+	//div(9, 5)
 	//fibonaci(three)
 	//fibonaci(succ(succ(three)))
 	factorial(succ(succ(three)))
