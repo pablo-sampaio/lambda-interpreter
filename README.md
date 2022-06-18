@@ -48,11 +48,11 @@ DECLARATIONS
 	y-combinator := \lambda g . (\lambda x . g(x(x))) (\lambda y . g(y(y)))
 
 	factorial := y-combinator
-			     (  \lambda fact, n . 
-				    if-then-else (  is-zero(n)  ) 
-                    (  one  )
-                    (  mult(n,fact(pred(n)))  )
-			     )
+	(  \lambda fact, n . 
+		if-then-else (  is-zero(n)  ) 
+			(  one  )
+			(  mult(n,fact(pred(n)))  )
+	)
 
 BODY
 
@@ -80,11 +80,11 @@ This project was created around 2014 as a side project (almost as a hobby) to pr
 and to play a little bit with lambda calculus.
 
 The expression evaluation works correctly (as far as I know), but is inherently inefficient and may give some heap or stack overflow in larger expressions. 
-It does not follow a specific formally-defined evaluation scheme precisely. It was initially implemented by intuition, based on typical programming languages
+It does not follow a specific formally-defined evaluation scheme precisely. It was initially implemented "by intuition", based on typical programming languages
 interpreters, then I have changed it some times to try to improve efficiency, trying some heuristic improvements as well.
 
 
 ## Reference
 
-The wikipedia article is a good introduction to lambda calculus (it was good back in 2014 and it is still good in 2022):
+The wikipedia article is a good introduction to lambda calculus:
 https://en.wikipedia.org/wiki/Lambda_calculus
